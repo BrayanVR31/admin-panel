@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: light --default, night --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --color-primary: #211c84;
+  --color-neutral: #e6edef;
+}
+
+@theme {
+  --spacing-navbar-peak: 85px;
+  --spacing-sidebar-min-span: 80px;
+  --spacing-sidebar-max-span: 250px;
+  --spacing-sidebar-peak: calc(100vh - var(--spacing-sidebar-min-span));
+  --spacing-content-peak: calc(100vh - var(--spacing-navbar-peak));
+}
