@@ -1,17 +1,43 @@
-import Navbar from "./Navbar";
-import Sidebar from "./sidebar/Sidebar";
+import useMediaQuery from "@/hooks/useMediaQuery";
+import Navbar from "@/components/Navbar";
+import {
+  Sidebar,
+  SidebarProvider,
+  useSidebar,
+  DockNavigation,
+} from "@/components/sidebar";
 
-const Layout = () => {
+const Content = () => {
+  const { isCollapsed } = useSidebar();
+  const isMobile = useMediaQuery("(max-width: 500px)");
   return (
-    <div className="flex bg-white">
-      <Sidebar />
-      <div className="bg-neutral flex-1 ml-w-sidebar-max-span min-h-screen ml-sidebar-max-span">
-        <Navbar />
-        <div className="min-h-content-peak">
-          <button className="btn btn-primary">click</button>
+    <div
+      style={{
+        marginLeft:
+          (isMobile && "0") ||
+          `var(--spacing-sidebar-${isCollapsed ? "min" : "max"}-span)`,
+      }}
+      className="bg-base-100 flex-1 min-h-screen"
+    >
+      <Navbar />
+      {isMobile && <DockNavigation />}
+      <div className="min-h-content-peak">
+        <div className="px-8 py-6">
+          <p>Content</p>
         </div>
       </div>
     </div>
+  );
+};
+
+const Layout = () => {
+  return (
+    <SidebarProvider>
+      <div className="flex bg-base-100">
+        <Sidebar />
+        <Content />
+      </div>
+    </SidebarProvider>
   );
 };
 
