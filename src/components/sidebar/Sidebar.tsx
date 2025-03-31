@@ -1,19 +1,34 @@
 import { Layers, LogOut, Menu, User } from "lucide-react";
+import { motion } from "motion/react";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { menuItems } from "./menuItems";
 import { useSidebar } from "./SidebarProvider";
+
+interface LogoProps {
+  showTitle?: boolean;
+}
+
+const Logo = ({ showTitle = false }: LogoProps) => {
+  return (
+    <div
+      className={`flex items-center justify-[${
+        showTitle ? "start" : "center"
+      }] w-full h-navbar-peak sticky top-0 left-0 border-b border-b-neutral px-4 bg-transparent after:content-[''] after:w-2 after:h-full after:bg-transparent after:right-0 after:top-0 after:absolute after:translate-x-1/2`}
+    >
+      <div className="bg-primary w-10 aspect-square flex items-center justify-center rounded-lg flex-wrap">
+        <Layers className="w-5" />
+      </div>
+      {showTitle && <span className="font-semibold ml-3.5">Stockdash</span>}
+    </div>
+  );
+};
 
 const CollapsedMenu = () => {
   const profileUrl =
     "https://external-preview.redd.it/TwdryA_T40CDW6pqOOChOhwkKLUlL3cMsLm7foSCrjw.gif?format=png8&s=50bebd0bb62019ca4507d4197c71508901620156";
   return (
     <>
-      {/** Logo */}
-      <div className="flex items-center justify-center w-full h-navbar-peak sticky top-0 left-0 border-b border-b-neutral bg-navbar after:content-[''] after:w-2 after:h-full after:bg-navbar after:right-0 after:top-0 after:absolute after:translate-x-1/2">
-        <div className="bg-primary w-10 aspect-square flex items-center justify-center rounded-lg flex-wrap">
-          <Layers className="w-5" />
-        </div>
-      </div>
+      <Logo />
       <div className="flex-1 flex flex-col justify-between items-center">
         <ul className="menu w-full items-center gap-y-5">
           {menuItems.map((item) => {
@@ -33,7 +48,7 @@ const CollapsedMenu = () => {
                     className="dropdown-content menu bg-neutral rounded-box z-1 w-52 p-2 shadow-lg text-base-content"
                   >
                     {item.subMenu.map((subItem) => (
-                      <li>
+                      <li key={`${item.title}-${subItem.subTitle}`}>
                         <a
                           className="hover:bg-primary hover:text-white"
                           href={subItem.url}
@@ -76,18 +91,13 @@ const SingleMenu = () => {
   return (
     <>
       {/** Logo */}
-      <div className="flex items-center justify-start w-full h-navbar-peak sticky top-0 left-0 border-b border-b-neutral px-4 bg-navbar after:content-[''] after:w-2 after:h-full after:bg-navbar after:right-0 after:top-0 after:absolute after:translate-x-1/2">
-        <div className="bg-primary w-10 aspect-square flex items-center justify-center rounded-lg flex-wrap mr-2">
-          <Layers className="w-5" />
-        </div>
-        <span className="font-semibold">Stockdash</span>
-      </div>
+      <Logo showTitle />
       <div className="flex-1 flex flex-col justify-between">
         <ul className="menu w-full">
           {menuItems.map((item) => (
             <li key={item.title}>
               {item.subMenu ? (
-                <details open>
+                <details>
                   <summary className="hover:bg-gray-400/10">
                     <item.icon className="w-4" />
                     <span>{item.title}</span>
@@ -111,19 +121,42 @@ const SingleMenu = () => {
             </li>
           ))}
         </ul>
-        <div className="flex items-center justify-between flex-wrap py-2.5 px-4">
-          <div className="flex items-center">
-            <div className="avatar mr-3">
-              <div className="w-9 h-9 rounded-full">
-                <img src={profileUrl} />
+        <div className="dropdown dropdown-right dropdown-end px-2 py-2.5">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-xl btn-ghost bg-transparent hover:bg-neutral-500/20 text-white w-full justify-between"
+          >
+            <div className="flex items-center">
+              <div className="avatar mr-3">
+                <div className="w-9 h-9 rounded-full">
+                  <img src={profileUrl} />
+                </div>
               </div>
+              <p className="flex flex-col">
+                <span className="font-semibold text-sm">Username here</span>
+                <span className="text-xs">email@gmail.com</span>
+              </p>
             </div>
-            <p className="flex flex-col">
-              <span className="font-semibold text-sm">Username here</span>
-              <span className="text-xs">email@gmail.com</span>
-            </p>
+            <LogOut className="w-4.5" />
           </div>
-          <LogOut className="w-4.5" />
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu bg-layer rounded-box z-1 w-52 shadow-md"
+          >
+            <li>
+              <a className="hover:bg-primary">
+                <User className="w-4.5" />
+                <span>Perfil</span>
+              </a>
+            </li>
+            <li>
+              <a className="hover:bg-primary">
+                <LogOut className="w-4.5" />
+                <span>Salir de sesión</span>
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </>
@@ -133,16 +166,27 @@ const SingleMenu = () => {
 const DesktopSidebar = () => {
   const { isCollapsed } = useSidebar();
   return (
-    <aside
+    <motion.aside
+      layout
+      animate={{
+        width: isCollapsed
+          ? "var(--spacing-sidebar-min-span)"
+          : "var(--spacing-sidebar-max-span)",
+      }}
       style={{
         width: isCollapsed
           ? "var(--spacing-sidebar-min-span)"
           : "var(--spacing-sidebar-max-span)",
       }}
       className="admin-sidebar"
+      transition={{
+        duration: 0.35,
+        type: "spring",
+        bounce: 0.2,
+      }}
     >
       {isCollapsed ? <CollapsedMenu /> : <SingleMenu />}
-    </aside>
+    </motion.aside>
   );
 };
 

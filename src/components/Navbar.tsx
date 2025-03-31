@@ -4,14 +4,16 @@ import {
   Moon,
   Sun,
   PanelRight,
-  Tally4,
   User,
   Settings,
   LogOut,
-  LayoutGrid,
+  AlignJustify,
+  UserRoundCog,
 } from "lucide-react";
+import { motion } from "motion/react";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { useSidebar, SidebarDrawer } from "@/components/sidebar";
+import { useEffect } from "react";
 
 const MobileNavbar = () => {
   return (
@@ -29,21 +31,37 @@ const DesktopNavbar = () => {
   const profileUrl =
     "https://external-preview.redd.it/TwdryA_T40CDW6pqOOChOhwkKLUlL3cMsLm7foSCrjw.gif?format=png8&s=50bebd0bb62019ca4507d4197c71508901620156";
   const { setIsCollapsed, isCollapsed } = useSidebar();
+  const isMobile = useMediaQuery("(max-width: 1000px)");
+  useEffect(() => {
+    if (isMobile) setIsCollapsed(true);
+  }, [isMobile]);
+  const handleClick = () => {
+    if (!isMobile) setIsCollapsed(!isCollapsed);
+  };
   return (
     <nav className="flex bg-navbar border-b border-neutral flex-wrap sticky top-0 right-0 h-navbar-peak">
       <div className="px-8 py-6 flex items-center justify-between flex-1">
         <div className="flex items-center gap-x-6 max-[500px]:hidden">
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`btn btn-circle transition-transform duration-500 ${
-              isCollapsed ? "btn-primary rotate-0" : "btn-neutral rotate-180"
-            }`}
+          <motion.button
+            onClick={handleClick}
+            initial={false}
+            animate={{
+              rotate: isCollapsed ? 0 : 180,
+              backgroundColor: isCollapsed
+                ? "var(--color-primary)"
+                : "var(--color-neutral)",
+              color: isCollapsed
+                ? "var(--color-primary-content)"
+                : "var(--color-neutral-content)",
+              transition: { duration: 0.035 },
+            }}
+            className={`btn btn-circle transition-transform duration-500`}
           >
             <PanelRight className="w-4" />
-          </button>
+          </motion.button>
           <h2 className="font-extrabold text-2xl">Analitycs</h2>
         </div>
-        <div className="flex gap-x-6">
+        <div className="flex gap-x-6 max-[820px]:hidden">
           <label className="input input-md bg-neutral max-[500px]:hidden">
             <Search />
             <input type="search" className="grow" placeholder="Busca aquí" />
@@ -86,7 +104,7 @@ const DesktopNavbar = () => {
               <li>
                 <a className="hover:bg-primary hover:text-white">
                   <User className="w-4" />
-                  <span>Perfil</span>
+                  <span>Opciones de perfil</span>
                 </a>
               </li>
               <li>
@@ -103,6 +121,60 @@ const DesktopNavbar = () => {
               </li>
             </ul>
           </div>
+        </div>
+        <div className="dropdown dropdown-end hidden max-[820px]:block">
+          <div tabIndex={0} role="button" className="btn btn-circle">
+            <AlignJustify className="w-4.5" />
+          </div>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu bg-layer rounded-box z-1 w-52 py-4 px-2 shadow-sm"
+          >
+            <li className="cursor-pointer">
+              <div>
+                <label className="swap swap-rotate">
+                  <input
+                    type="checkbox"
+                    className="theme-controller"
+                    value="light"
+                    id="theme-switcher"
+                  />
+                  <Sun className="swap-off h-4.5 w-4.5 fill-current" />
+                  <Moon className="swap-on h-4.5 w-4.5 fill-current" />
+                </label>
+                <label htmlFor="theme-switcher">Cambiar el tema</label>
+              </div>
+            </li>
+            <li>
+              <details>
+                <summary>
+                  <UserRoundCog className="w-4" />
+                  <span>Opciones de perfil</span>
+                </summary>
+                <ul>
+                  <li>
+                    <a className="btn btn-sm btn-outline btn-primary border-0 ring-0 justify-start">
+                      <User className="w-4" />
+                      <span>Perfil</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a className="btn btn-sm btn-outline btn-primary border-0 ring-0 justify-start">
+                      <Settings className="w-4" />
+                      <span>Configuraciones</span>
+                    </a>
+                  </li>
+                </ul>
+              </details>
+            </li>
+
+            <li>
+              <a>
+                <LogOut className="w-4" />
+                <span>Salir de sesión</span>
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </nav>
