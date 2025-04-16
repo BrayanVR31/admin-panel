@@ -1,8 +1,14 @@
-import "./App.css";
-import Layout from "./Layout";
+import { BrowserRouter } from "react-router";
+import { Toaster } from "react-hot-toast";
+import Router from "@/routes/Router";
 
 const App = () => {
-  return <Layout />;
+  return (
+    <BrowserRouter>
+      <Router />
+      <Toaster position="bottom-right" />
+    </BrowserRouter>
+  );
 };
 
 export default App;

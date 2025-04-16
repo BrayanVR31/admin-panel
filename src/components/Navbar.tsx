@@ -14,20 +14,26 @@ import { motion } from "motion/react";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { useSidebar, SidebarDrawer } from "@/components/sidebar";
 import { useEffect } from "react";
+import { useSystemStore } from "@/store/systemStore";
+import { useLogOut } from "@/hooks/useAuth";
 
 const MobileNavbar = () => {
   return (
-    <nav className="min-h-16 px-8 flex items-center justify-between bg-navbar sticky inset-0">
-      <SidebarDrawer />
-      <button className="btn btn-circle indicator">
-        <span className="indicator-item status status-success" />
-        <Bell className="w-4.5" />
-      </button>
-    </nav>
+    <div>
+      <nav className="min-h-16 px-8 flex items-center justify-between bg-navbar  inset-0">
+        <SidebarDrawer />
+        <button className="btn btn-circle indicator">
+          <span className="indicator-item status status-success" />
+          <Bell className="w-4.5" />
+        </button>
+      </nav>
+    </div>
   );
 };
 
 const DesktopNavbar = () => {
+  const logOut = useLogOut();
+  const pageTitle = useSystemStore((state) => state.pageTitle);
   const profileUrl =
     "https://external-preview.redd.it/TwdryA_T40CDW6pqOOChOhwkKLUlL3cMsLm7foSCrjw.gif?format=png8&s=50bebd0bb62019ca4507d4197c71508901620156";
   const { setIsCollapsed, isCollapsed } = useSidebar();
@@ -39,7 +45,7 @@ const DesktopNavbar = () => {
     if (!isMobile) setIsCollapsed(!isCollapsed);
   };
   return (
-    <nav className="flex bg-navbar border-b border-neutral flex-wrap sticky top-0 right-0 h-navbar-peak">
+    <nav className="flex bg-navbar border-b border-neutral flex-wrap sticky top-0 right-0 h-navbar-peak z-20">
       <div className="px-8 py-6 flex items-center justify-between flex-1">
         <div className="flex items-center gap-x-6 max-[500px]:hidden">
           <motion.button
@@ -59,7 +65,7 @@ const DesktopNavbar = () => {
           >
             <PanelRight className="w-4" />
           </motion.button>
-          <h2 className="font-extrabold text-2xl">Analitycs</h2>
+          <h2 className="font-extrabold text-2xl">{pageTitle}</h2>
         </div>
         <div className="flex gap-x-6 max-[820px]:hidden">
           <label className="input input-md bg-neutral max-[500px]:hidden">
@@ -114,10 +120,13 @@ const DesktopNavbar = () => {
                 </a>
               </li>
               <li>
-                <a className="hover:bg-primary hover:text-white">
+                <button
+                  onClick={() => logOut()}
+                  className="hover:bg-primary hover:text-white"
+                >
                   <LogOut className="w-4" />
                   <span>Salir de sesión</span>
-                </a>
+                </button>
               </li>
             </ul>
           </div>

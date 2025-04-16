@@ -1,6 +1,8 @@
 import { Layers, LogOut, Menu, User } from "lucide-react";
 import { motion } from "motion/react";
+import { NavLink } from "react-router";
 import useMediaQuery from "@/hooks/useMediaQuery";
+import { useSplitRoute } from "@/hooks/useSplitRoute";
 import { menuItems } from "./menuItems";
 import { useSidebar } from "./SidebarProvider";
 
@@ -24,6 +26,7 @@ const Logo = ({ showTitle = false }: LogoProps) => {
 };
 
 const CollapsedMenu = () => {
+  const { joined } = useSplitRoute();
   const profileUrl =
     "https://external-preview.redd.it/TwdryA_T40CDW6pqOOChOhwkKLUlL3cMsLm7foSCrjw.gif?format=png8&s=50bebd0bb62019ca4507d4197c71508901620156";
   return (
@@ -38,23 +41,26 @@ const CollapsedMenu = () => {
                   <div
                     tabIndex={0}
                     role="button"
-                    className="btn btn-square bg-transparent border-none shadow-none text-gray-400 hover:text-white tooltip tooltip-secondary tooltip-right"
+                    className={`btn btn-square border-none bg-${item.parentUrl === joined ? "primary" : "transparent"} shadow-none ${item.parentUrl === joined ? "text-white" : "text-gray-400"} hover:text-white tooltip tooltip-secondary tooltip-right`}
                     data-tip={item.title}
                   >
                     <item.icon className="w-5" />
                   </div>
                   <ul
                     tabIndex={0}
-                    className="dropdown-content menu bg-neutral rounded-box z-1 w-52 p-2 shadow-lg text-base-content"
+                    className="dropdown-content menu bg-layer rounded-box w-52 p-2 shadow-lg text-base-content"
                   >
                     {item.subMenu.map((subItem) => (
-                      <li key={`${item.title}-${subItem.subTitle}`}>
-                        <a
-                          className="hover:bg-primary hover:text-white"
-                          href={subItem.url}
+                      <li
+                        className="z-50 relative"
+                        key={`${item.title}-${subItem.subTitle}`}
+                      >
+                        <NavLink
+                          className={`hover:bg-primary hover:text-white`}
+                          to={subItem.url}
                         >
                           {subItem.subTitle}
-                        </a>
+                        </NavLink>
                       </li>
                     ))}
                   </ul>
@@ -63,12 +69,16 @@ const CollapsedMenu = () => {
             }
             return (
               <li key={item.title}>
-                <button
-                  className="btn btn-square bg-transparent border-none shadow-none text-gray-400 hover:text-white tooltip tooltip-secondary tooltip-right"
+                <NavLink
+                  className={({ isActive }) =>
+                    `btn btn-square bg-${isActive ? "primary" : "transparent"} border-none shadow-none text-${isActive ? "white" : "gray-400"} hover:text-white tooltip tooltip-secondary tooltip-right`
+                  }
+                  end
                   data-tip={item.title}
+                  to={`/${item.parentUrl}`}
                 >
                   <item.icon className="w-5 " />
-                </button>
+                </NavLink>
               </li>
             );
           })}
@@ -86,6 +96,7 @@ const CollapsedMenu = () => {
 };
 
 const SingleMenu = () => {
+  const { joined } = useSplitRoute();
   const profileUrl =
     "https://external-preview.redd.it/TwdryA_T40CDW6pqOOChOhwkKLUlL3cMsLm7foSCrjw.gif?format=png8&s=50bebd0bb62019ca4507d4197c71508901620156";
   return (
@@ -98,25 +109,36 @@ const SingleMenu = () => {
             <li key={item.title}>
               {item.subMenu ? (
                 <details>
-                  <summary className="hover:bg-gray-400/10">
+                  <summary
+                    className={` ${(item.parentUrl === joined && "bg-primary") || "hover:bg-gray-400/10"}`}
+                  >
                     <item.icon className="w-4" />
                     <span>{item.title}</span>
                   </summary>
                   <ul>
                     {item.subMenu.map((subItem) => (
                       <li key={`${item.title}-${subItem.subTitle}`}>
-                        <a className="hover:bg-gray-400/10" href={subItem.url}>
+                        <NavLink
+                          className="hover:bg-gray-400/10"
+                          to={subItem.url}
+                        >
                           {subItem.subTitle}
-                        </a>
+                        </NavLink>
                       </li>
                     ))}
                   </ul>
                 </details>
               ) : (
-                <a className="hover:bg-gray-400/10">
+                <NavLink
+                  className={({ isActive }) =>
+                    `hover:bg-gray-400/10 bg-${isActive ? "primary" : "transparent"}`
+                  }
+                  to={`/${item.parentUrl}`}
+                  end
+                >
                   <item.icon className="w-4" />
                   <span>{item.title}</span>
-                </a>
+                </NavLink>
               )}
             </li>
           ))}
@@ -178,7 +200,7 @@ const DesktopSidebar = () => {
           ? "var(--spacing-sidebar-min-span)"
           : "var(--spacing-sidebar-max-span)",
       }}
-      className="admin-sidebar"
+      className="admin-sidebar z-10"
       transition={{
         duration: 0.35,
         type: "spring",
@@ -216,7 +238,7 @@ const SidebarDrawer = () => {
           aria-label="close sidebar"
           className="drawer-overlay"
         />
-        <ul className="menu bg-base-100 text-base-content min-h-full w-[85%]">
+        <ul className="menu bg-base-100 text-base-content min-h-full w-[80%]">
           <li className="border-b border-neutral">
             <div className="flex flex-col pb-4">
               <div className="avatar avatar-online">
@@ -239,18 +261,21 @@ const SidebarDrawer = () => {
                   <ul>
                     {item.subMenu.map((subItem) => (
                       <li key={`${item.title}-${subItem.subTitle}`}>
-                        <a className="hover:bg-gray-400/10" href={subItem.url}>
+                        <NavLink
+                          className="hover:bg-gray-400/10"
+                          to={subItem.url}
+                        >
                           {subItem.subTitle}
-                        </a>
+                        </NavLink>
                       </li>
                     ))}
                   </ul>
                 </details>
               ) : (
-                <a className="hover:bg-gray-400/10">
+                <NavLink to="" className="hover:bg-gray-400/10">
                   <item.icon className="w-4" />
                   <span>{item.title}</span>
-                </a>
+                </NavLink>
               )}
             </li>
           ))}
